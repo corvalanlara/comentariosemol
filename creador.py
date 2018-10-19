@@ -1,16 +1,31 @@
-from selenium.webdriver import Firefox
+#!/usr/bin/python
+#-*- coding: utf-8 -*-
+
+import os
+import sys
+import argparse
+from datetime import datetime
+from __init__ import __version__
+from bs4 import BeautifulSoup
+from selenium.webdriver import Firefox, Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support import expected_conditions as expected
 from selenium.webdriver.support.wait import WebDriverWait
-from bs4 import BeautifulSoup
-import argparse
-import csv
-from urllib.parse import urlparse
-import os
-from __init__ import __version__
-from datetime import datetime
+
+if sys.version < '3':
+    import unicodecsv as csv
+    import codecs
+    from urlparse import urlparse
+    import cStringIO
+    def u(x):
+        return codecs.unicode_escape_decode(x)[0]
+else:
+    import csv
+    from urllib.parse import urlparse
+    def u(x):
+        return x
 
 #Variables necesarias
 ahora = datetime.today()
@@ -87,17 +102,31 @@ def crear_csv(listas, url, path):
     fecha = listas[4]
     unidos = zip(listas[0], listas[1], listas[2], 
                  listas[3], listas[5], listas[6])
-    with open(path, 'w') as csvfile:
-        escriba = csv.writer(csvfile, delimiter=',',
-                             quoting=csv.QUOTE_ALL)
-        escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
-                          'Original o Respuesta', 'Comentario', 
-                          'Likes', 'Dislikes'])
-        for comentario, nombre, likes, dislikes, iden, resp  in unidos:
-            escriba.writerow([url, fecha, nombre, iden, resp, 
-                comentario, likes, dislikes])
+
+    if sys.version > '3':
+        with open(path, 'w') as csvfile:
+            escriba = csv.writer(csvfile, delimiter=',',
+                                 quoting=csv.QUOTE_ALL)
+            escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
+                              'Original o Respuesta', 'Comentario', 
+                              'Likes', 'Dislikes'])
+            for comentario, nombre, likes, dislikes, iden, resp  in unidos:
+                escriba.writerow([url, fecha, nombre, iden, resp, 
+                                 comentario, likes, dislikes])
+    else:
+        with open(path, mode='wb') as csvfile:
+            escriba = csv.writer(csvfile, delimiter=',',
+                                 quoting=csv.QUOTE_ALL,
+                                encoding = 'utf-8')
+            escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
+                              'Original o Respuesta', 'Comentario', 
+                              'Likes', 'Dislikes'])
+            for comentario, nombre, likes, dislikes, iden, resp  in unidos:
+                escriba.writerow([url, fecha, nombre, iden, resp, 
+                                 comentario, likes, dislikes])
+
     if os.path.isfile(path):
-        print(f'Archivo guardado en {path}')
+        print('Archivo guardado en {}'.format(path))
 
 def get_parser():
     descripcion = """Este programa devuelve una lista 
@@ -126,7 +155,6 @@ def ejecutar(noticia, filepath, limite, navegador):
         for x in listas:
             if isinstance(x, list):
                 limitar(x, limite)
-
 
     crear_csv(listas, noticia, filepath)
 
@@ -194,7 +222,7 @@ def main():
 
     if filepath == os.getcwd():
         if isinstance(noticia, str):
-            filepath = nombrar(filepath, noticia)
+            filepath = nombrar(filepath, url)
         elif isinstance(noticia, list):
             lista_filepaths = []
             for x in url:
