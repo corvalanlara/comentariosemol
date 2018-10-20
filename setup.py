@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name = "comentariosemol",
-    version = "0.1.0",
+    version = "0.1.1",
     author = "Daniel Corvalán",
     author_email = "corvalanlara@protonmail.com",
     description = "Extrae los comentarios de las noticias de EMOL en formato csv",

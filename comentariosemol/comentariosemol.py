@@ -6,7 +6,7 @@ import sys
 import pickle
 import argparse
 from datetime import datetime
-from __init__ import __version__
+from . import __version__
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -144,7 +144,9 @@ def crear_csv(listas, url, path):
 
 def get_parser():
     descripcion = """Este programa devuelve una lista 
-    de comentarios publicadas en EMOL en formato csv."""
+    de comentarios publicadas en EMOL en formato csv.
+    Más información de uso y configuración en 
+    https://github.com/corvalanlara/comentariosemol"""
     parser = argparse.ArgumentParser(description = descripcion)
     parser.add_argument('url', metavar='URL', type=str, 
                         help='URL de la cual se obtendrán los comentarios. \
