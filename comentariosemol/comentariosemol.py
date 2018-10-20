@@ -3,16 +3,18 @@
 
 import os
 import sys
+import pickle
 import argparse
 from datetime import datetime
 from __init__ import __version__
+
 from bs4 import BeautifulSoup
-from selenium.webdriver import Firefox, Chrome
 from selenium.webdriver.common.by import By
+from selenium.webdriver import Firefox, Chrome
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.support import expected_conditions as expected
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as expected
 
 if sys.version < '3':
     import unicodecsv as csv
@@ -32,6 +34,8 @@ ahora = datetime.today()
 sep = "-"
 tiempo = str(ahora.day) + sep + str(ahora.month) + \
 "_" + str(ahora.hour) + sep + str(ahora.minute)
+current = os.getcwd()
+datapersistente = os.path.join(current, 'path.e')
 
 def limitar(lista, numero):
     if len(lista) <= numero:
@@ -42,12 +46,22 @@ def limitar(lista, numero):
         lista.pop()
         limitar(lista, numero)
 
-def crear_navegador():
-    options = Options()
-    options.add_argument('-headless')
-    driver = Firefox(executable_path='geckodriver', 
-        firefox_options=options)
-    return driver
+def crear_navegador(path):
+    try:
+        driver = Chrome(executable_path=path)
+        return driver
+    except:
+        pass
+    try:
+        options = Options()
+        options.add_argument('-headless')
+        driver = Firefox(executable_path=path, 
+                        firefox_options=options)
+        return driver
+    except:
+        pass
+    print('No tiene un navegador compatible o no ha configurado correctamente este programa para trabajar con éste.')
+    sys.exit()
 
 def get_pagina(url, driver):
     wait = WebDriverWait(driver, timeout=1)
@@ -141,8 +155,13 @@ def get_parser():
                         archivo .csv donde se guardarán los comentarios')
     parser.add_argument('-n', '--numero', help='Número límite de \
                         comentarios a extraer.', default = 0, type=int)
+    parser.add_argument('-c', '--configurar', 
+                        help='Ingresar ubicación del archivo ejecutable \
+                        vinculado al navegador de preferencia',
+                        action = 'store_true')
     parser.add_argument('-v', '--version', help='Imprime la versión \
-                        actual de comentariosemol', action='store_true')
+                        actual de comentariosemol. Utilizar escribiendo \
+                        "[texto] -v"', action='store_true')
     
     return parser
 
@@ -164,10 +183,35 @@ def nombrar(filepath, url):
     nombre_archivo = "{}.csv".format(filepath + '/' + primero + segundo + tiempo)
     return nombre_archivo
 
+def configurar():
+    if sys.version > '3':
+        path = input('Ingrese ubicación del archivo ejecutable correspondiente a su navegador de preferencia (Leer documentación para más información)\n')
+    else:
+        path = raw_input('Ingrese ubicación del archivo ejecutable correspondiente a su navegador de preferencia (Leer documentación para más información)\n')
+    driver = crear_navegador(path)
+    driver.quit()
+    
+    archivo = open(datapersistente, 'wb')
+    pickle.dump(path, archivo)
+    archivo.close()
+
+    print('Configuración exitosa')
+
+    return path
+
 def main():
     parser = get_parser()
     args = vars(parser.parse_args())
-    
+    datos = ''
+
+    if os.path.isfile(datapersistente):
+        archivo = open(datapersistente, 'rb')
+        datos = pickle.load(archivo)
+        archivo.close
+
+    if (datos  == '' or args['configurar']):
+        datos = configurar()
+
     if args['version']:
         print(__version__)
         return
@@ -238,8 +282,9 @@ def main():
             return
 
     limite = args['numero']
-
-    navegador = crear_navegador()
+    
+    exec_path = os.getenv('COMENTARIOS_EMOL')
+    navegador = crear_navegador(datos)
     if isinstance(noticia, str):
         ejecutar(noticia, filepath, limite, navegador)
     elif isinstance(noticia, list):
