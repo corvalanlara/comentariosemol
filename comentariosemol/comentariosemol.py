@@ -6,7 +6,7 @@ import sys
 import pickle
 import argparse
 from datetime import datetime
-from . import __version__
+from __init__ import __version__
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -18,16 +18,10 @@ from selenium.webdriver.support import expected_conditions as expected
 
 if sys.version < '3':
     import unicodecsv as csv
-    import codecs
     from urlparse import urlparse
-    import cStringIO
-    def u(x):
-        return codecs.unicode_escape_decode(x)[0]
 else:
     import csv
     from urllib.parse import urlparse
-    def u(x):
-        return x
 
 #Variables necesarias
 ahora = datetime.today()
