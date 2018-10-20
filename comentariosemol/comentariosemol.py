@@ -60,7 +60,8 @@ def crear_navegador(path):
         return driver
     except:
         pass
-    print('No tiene un navegador compatible o no ha configurado correctamente este programa para trabajar con éste.')
+    print('No tiene un navegador compatible o no ha configurado correctamente este '
+        + 'programa para trabajar con éste.')
     sys.exit()
 
 def get_pagina(url, driver):
@@ -187,9 +188,11 @@ def nombrar(filepath, url):
 
 def configurar():
     if sys.version > '3':
-        path = input('Ingrese ubicación del archivo ejecutable correspondiente a su navegador de preferencia (Leer documentación para más información)\n')
+        path = input('Ingrese ubicación del archivo ejecutable correspondiente a '
+            +'su navegador de preferencia (Leer documentación para más información)\n')
     else:
-        path = raw_input('Ingrese ubicación del archivo ejecutable correspondiente a su navegador de preferencia (Leer documentación para más información)\n')
+        path = raw_input('Ingrese ubicación del archivo ejecutable correspondiente a su '
+            + 'navegador de preferencia (Leer documentación para más información)\n')
     driver = crear_navegador(path)
     driver.quit()
     
