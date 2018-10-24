@@ -282,7 +282,6 @@ def main():
 
     limite = args['numero']
     
-    exec_path = os.getenv('COMENTARIOS_EMOL')
     navegador = crear_navegador(datos)
     if isinstance(noticia, str):
         ejecutar(noticia, filepath, limite, navegador)
