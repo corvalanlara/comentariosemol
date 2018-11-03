@@ -32,10 +32,10 @@ current = os.getcwd()
 datapersistente = os.path.join(current, 'path.e')
 
 def limitar(lista, numero):
-    if len(lista) <= numero:
-        return lista
-    elif isinstance(lista, int):
+    if isinstance(lista, int):
         return [lista]
+    elif len(lista) <= numero:
+        return lista
     else:
         lista.pop()
         limitar(lista, numero)
@@ -50,7 +50,7 @@ def crear_navegador(path):
         options = Options()
         options.add_argument('-headless')
         driver = Firefox(executable_path=path, 
-                        firefox_options=options)
+                         options=options)
         return driver
     except:
         pass
