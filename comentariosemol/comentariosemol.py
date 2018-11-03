@@ -6,7 +6,7 @@ import sys
 import pickle
 import argparse
 from datetime import datetime
-from __init__ import __version__
+from . import __version__
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
