@@ -6,7 +6,8 @@ import sys
 import pickle
 import argparse
 from datetime import datetime
-from . import __version__
+#__init__ sólo para desarrollo, en producción es .
+from __init__ import __version__
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -24,10 +25,6 @@ else:
     from urllib.parse import urlparse
 
 #Variables necesarias
-ahora = datetime.today()
-sep = "-"
-tiempo = str(ahora.day) + sep + str(ahora.month) + \
-"_" + str(ahora.hour) + sep + str(ahora.minute)
 current = os.getcwd()
 datapersistente = os.path.join(current, 'path.e')
 
@@ -56,7 +53,7 @@ def crear_navegador(path):
         pass
     print('No tiene un navegador compatible o no ha configurado correctamente este '
         + 'programa para trabajar con éste.')
-    sys.exit()
+    sys.exit(1)
 
 def get_pagina(url, driver):
     wait = WebDriverWait(driver, timeout=1)
@@ -114,7 +111,7 @@ def crear_csv(listas, url, path):
 
     if sys.version > '3':
         with open(path, 'w') as csvfile:
-            escriba = csv.writer(csvfile, delimiter=',',
+            escriba = csv.writer(csvfile, encoding='latin-1', delimiter=',',
                                  quoting=csv.QUOTE_ALL)
             escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
                               'Original o Respuesta', 'Comentario', 
@@ -126,7 +123,7 @@ def crear_csv(listas, url, path):
         with open(path, mode='wb') as csvfile:
             escriba = csv.writer(csvfile, delimiter=',',
                                  quoting=csv.QUOTE_ALL,
-                                encoding = 'utf-8')
+                                encoding = 'latin-1')
             escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
                               'Original o Respuesta', 'Comentario', 
                               'Likes', 'Dislikes'])
@@ -175,6 +172,10 @@ def ejecutar(noticia, filepath, limite, navegador):
     crear_csv(listas, noticia, filepath)
 
 def nombrar(filepath, url):
+    ahora = datetime.today()
+    sep = "-"
+    tiempo = str(ahora.day) + sep + str(ahora.month) + \
+        "_" + str(ahora.hour) + sep + str(ahora.minute)
     primero = url.netloc.replace('www.', '').replace('.com', '')
     segundo = url.path.split('/')[-1].replace('.html', '')[:40]
     nombre_archivo = "{}.csv".format(filepath + '/' + primero + segundo + tiempo)
@@ -187,8 +188,18 @@ def configurar():
     else:
         path = raw_input('Ingrese ubicación del archivo ejecutable correspondiente a su '
             + 'navegador de preferencia (Leer documentación para más información)\n')
-    driver = crear_navegador(path)
-    driver.quit()
+    
+    if os.path.isfile(path):
+        try:
+            driver = crear_navegador(path)
+            driver.quit()
+        except:
+            print('Archivo incorrecto. Inténtelo nuevamente.')
+            sys.exit(2)
+    else:
+        print('El archivo no existe.')
+        return
+
     
     archivo = open(datapersistente, 'wb')
     pickle.dump(path, archivo)
