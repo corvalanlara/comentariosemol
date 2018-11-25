@@ -110,7 +110,7 @@ def crear_csv(listas, url, path):
                  listas[3], listas[5], listas[6])
 
     if sys.version > '3':
-        with open(path, 'w', encoding='latin-1') as csvfile:
+        with open(path, 'w') as csvfile:
             escriba = csv.writer(csvfile, delimiter=',',
                                  quoting=csv.QUOTE_ALL)
             escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
