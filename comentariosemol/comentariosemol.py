@@ -7,7 +7,7 @@ import pickle
 import argparse
 from datetime import datetime
 #__init__ sólo para desarrollo, en producción es .
-from __init__ import __version__
+from . import __version__
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
@@ -110,8 +110,8 @@ def crear_csv(listas, url, path):
                  listas[3], listas[5], listas[6])
 
     if sys.version > '3':
-        with open(path, 'w') as csvfile:
-            escriba = csv.writer(csvfile, encoding='latin-1', delimiter=',',
+        with open(path, 'w', encoding='latin-1') as csvfile:
+            escriba = csv.writer(csvfile, delimiter=',',
                                  quoting=csv.QUOTE_ALL)
             escriba.writerow(['URL', 'Fecha', 'Autor', 'ID',
                               'Original o Respuesta', 'Comentario', 
